@@ -1,0 +1,182 @@
+/* Globals */
+
+@import url('https://fonts.googleapis.com/css2?family=Sofia+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+  font-family: 'Sofia Sans', 'Segoe UI', Arial, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+
+header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav-left {
+  flex: 1;
+  background: #000;
+  color: #fff;
+}
+
+.nav-right {
+  flex: 1;
+  justify-content: flex-end;
+  background: #000;
+  color: #fff;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  overflow-y: auto;
+}
+
+main>.ant-row {
+  flex: 1;
+  align-items: center;
+  padding: 20px;
+}
+
+main>.ant-form {
+  flex: 1;
+  align-items: center;
+  padding: 20px;
+}
+
+main>.ant-result {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Footer */
+
+footer {
+  padding: 12px 0;
+  background: #000;
+  color: #fff;
+  text-align: center;
+}
+
+/* Login */
+
+main .card-login {
+  box-shadow: 0 0 0.25rem #ccc;
+  text-align: center;
+}
+
+/* Dashboard */
+
+aside {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0.3rem 2rem rgb(0 0 0 / 10%);
+}
+
+section {
+  flex: 3;
+  padding: 0 40px 20px 40px;
+  overflow-y: auto;
+}
+
+section::-webkit-scrollbar {
+  display: none;
+}
+
+section .ant-card {
+  background: #eee;
+}
+
+section .ant-card-body {
+  position: relative;
+  padding: 4px !important;
+  min-height: 80px;
+}
+
+section .ant-card-body p {
+  margin: 0 !important;
+}
+
+section .ant-card-body p.button {
+  position: absolute;
+  top: -30px;
+  right: 4px;
+  text-align: right;
+}
+
+.cart {
+  margin: 0;
+  padding: 0 8px;
+  background: #1677ff;
+  color: #fff;
+}
+
+.ant-picker,
+.ant-input-number {
+  width: 100%;
+}
+
+aside .ant-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+aside .ant-list-header {
+  padding: 0 !important;
+  text-align: center;
+}
+
+aside .ant-spin-nested-loading {
+  flex: 1;
+  overflow-y: auto;
+}
+
+aside .ant-list-footer {
+  padding: 12px !important;
+  text-align: center;
+}
+
+aside .ant-list-item {
+  display: block;
+  margin: 0 !important;
+  padding: 12px !important;
+}
