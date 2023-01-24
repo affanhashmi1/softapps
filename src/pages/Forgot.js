@@ -1,23 +1,44 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Col, Form, Input, message, Row } from 'antd'
+import dayjs from 'dayjs'
 import { login } from '../store/auth'
-import { login as loginApi } from '../utilities/apis/user'
+import { updatePassword as forgotApi } from '../utilities/apis/user'
 import Layout from '../components/Layout'
 
 const Forgot = () => {
+  const params = new URLSearchParams(window.location.search)
+
+  const validateExpiry = async () => {
+    try {
+      if (!params.has('e')) throw new Error('Ohh! seems like your link has been expired')
+      const expiry = parseInt(params.get('e'))
+      const current = dayjs().unix()
+
+      if (expiry < current) throw new Error('Ohh! seems like your link has been expired')
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        duration: 10,
+        content: error.message
+      })
+    }
+  }
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [messageApi, contextHolder] = message.useMessage()
 
   const onFinish = async (values) => {
     try {
-      const response = await loginApi(values)
+      const response = await forgotApi({
+        email: params.get('email'),
+        password: values.password
+      })
       if (!response.status) throw new Error(response.message)
 
-      dispatch(login(response))
-      navigate('/dashboard')
+      navigate('/login')
     } catch (error) {
       messageApi.open({
         type: 'error',
@@ -31,7 +52,7 @@ const Forgot = () => {
   }
 
   useEffect(() => {
-    console.log('a');
+    validateExpiry()
   }, [])
 
   return (
@@ -47,28 +68,12 @@ const Forgot = () => {
           <Col span={6}>
             <Card className="card-login">
               <h1>SoftApps</h1>
-              <h3>Login</h3>
+              <h3>Update Password</h3>
               <Form
-                initialValues={{
-                  email: 'affanhashmi1@yahoo.com',
-                  password: '123'
-                }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 size="large"
               >
-                <Form.Item
-                  name="email"
-                  rules={[{
-                    required: true,
-                    message: 'Please input your email!'
-                  }]}
-                >
-                  <Input
-                    placeholder="Email"
-                  />
-                </Form.Item>
-
                 <Form.Item
                   name="password"
                   rules={[{
@@ -86,11 +91,9 @@ const Forgot = () => {
                     block
                     htmlType="submit"
                     type="primary"
-                  >Submit</Button>
+                  >Update</Button>
                 </Form.Item>
               </Form>
-
-              <a href="/">Don't have an account? Register now!</a>
             </Card>
           </Col>
           <Col span={9}></Col>

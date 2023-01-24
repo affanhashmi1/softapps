@@ -10,16 +10,19 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     createUser: (state, action) => {
-      state.user = action.payload.user
+      state.users.push(action.payload)
+    },
+    editUser: (state, action) => {
+      state.user = action.payload
     },
     updateUser: (state, action) => {
-      state.user = action.payload.user
+      state.users = state.users.map(user => user._id === action.payload._id ? action.payload : user)
     },
     deleteUser: (state, action) => {
-      state.user = action.payload.user
+      state.users = state.users.filter(user => user._id !== action.payload)
     },
     getUsers: (state, action) => {
-      state.user = action.payload.user
+      state.users = action.payload
     },
     getUser: (state, action) => {
       state.user = action.payload.user
@@ -27,5 +30,5 @@ export const userSlice = createSlice({
   },
 })
 
-export const { createUser, updateUser, deleteUser, getUsers, getUser } = userSlice.actions
+export const { createUser, editUser, updateUser, deleteUser, getUsers, getUser } = userSlice.actions
 export default userSlice.reducer

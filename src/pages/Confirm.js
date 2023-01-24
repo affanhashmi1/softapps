@@ -1,37 +1,29 @@
-import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { Button, Card, Col, Form, Input, message, Row } from 'antd'
-import { login } from '../store/auth'
-import { login as loginApi } from '../utilities/apis/user'
+import { useEffect, useState } from 'react'
+import { NavLink } from 'react-router-dom'
+import { Card, Col, Result, Row } from 'antd'
+import dayjs from 'dayjs'
+import { confirm as confirmApi } from '../utilities/apis/user'
 import Layout from '../components/Layout'
 
 const Confirm = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const [messageApi, contextHolder] = message.useMessage()
+  const [expired, setExpired] = useState(false)
 
-  const onFinish = async (values) => {
-    try {
-      const response = await loginApi(values)
-      if (!response.status) throw new Error(response.message)
-
-      dispatch(login(response))
-      navigate('/dashboard')
-    } catch (error) {
-      messageApi.open({
-        type: 'error',
-        content: error.message
-      })
-    }
-  }
-
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo)
+  const getConfirmation = async () => {
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('e')) return setExpired(true)
+    const expiry = parseInt(params.get('e'))
+    const current = dayjs().unix()
+  
+    if (expiry < current) return setExpired(true)
+  
+    const response = await confirmApi({
+      email: params.get('email')
+    })
+    console.log(response)
   }
 
   useEffect(() => {
-    console.log('a');
+    getConfirmation()
   }, [])
 
   return (
@@ -39,61 +31,22 @@ const Confirm = () => {
       header={false}
       footer={false}
     >
-      {contextHolder}
-
       <main>
         <Row>
-          <Col span={9}></Col>
-          <Col span={6}>
+          <Col span={6}></Col>
+          <Col span={12}>
             <Card className="card-login">
-              <h1>SoftApps</h1>
-              <h3>Login</h3>
-              <Form
-                initialValues={{
-                  email: 'affanhashmi1@yahoo.com',
-                  password: '123'
-                }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                size="large"
-              >
-                <Form.Item
-                  name="email"
-                  rules={[{
-                    required: true,
-                    message: 'Please input your email!'
-                  }]}
-                >
-                  <Input
-                    placeholder="Email"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="password"
-                  rules={[{
-                    required: true,
-                    message: 'Please input your password!'
-                  }]}
-                >
-                  <Input.Password
-                    placeholder="Password"
-                  />
-                </Form.Item>
-
-                <Form.Item>
-                  <Button
-                    block
-                    htmlType="submit"
-                    type="primary"
-                  >Submit</Button>
-                </Form.Item>
-              </Form>
-
-              <a href="/">Don't have an account? Register now!</a>
+              <Result
+                status={expired ? 'error' : 'success'}
+                title={expired ? 'Link Expired' : 'Email Verified'}
+                subTitle={expired ? 'Ohh! seems like your link has been expired' : 'Thank you for verifying your email, this prevent fraud email registrations'}
+                extra={[
+                  <NavLink key="login" to="/login">{expired ? 'Login again to receive an email' : 'Login to Continue'}</NavLink>
+                ]}
+              />
             </Card>
           </Col>
-          <Col span={9}></Col>
+          <Col span={6}></Col>
         </Row>
       </main>
     </Layout>

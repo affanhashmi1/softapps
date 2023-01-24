@@ -1,18 +1,19 @@
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { Button, Card, Col, Form, Input, message, Row } from 'antd'
 import { login } from '../store/auth'
-import { login as loginApi } from '../utilities/apis/user'
+import * as userApis from '../utilities/apis/user'
 import Layout from '../components/Layout'
 
 const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [form] = Form.useForm()
   const [messageApi, contextHolder] = message.useMessage()
 
   const onFinish = async (values) => {
     try {
-      const response = await loginApi(values)
+      const response = await userApis.login(values)
       if (!response.status) throw new Error(response.message)
 
       dispatch(login(response))
@@ -20,6 +21,7 @@ const Login = () => {
     } catch (error) {
       messageApi.open({
         type: 'error',
+        duration: 5,
         content: error.message
       })
     }
@@ -27,6 +29,28 @@ const Login = () => {
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo)
+  }
+
+  const onForgot = async () => {
+    try {
+      const email = form.getFieldValue('email')
+      if (!email) throw new Error('Enter email then click forgot password')
+
+      const response = await userApis.forgot({ email })
+      if (!response.status) throw new Error(response.message)
+
+      messageApi.open({
+        type: 'success',
+        duration: 5,
+        content: 'We have sent you a link to update your password'
+      })
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        duration: 5,
+        content: error.message
+      })
+    }
   }
 
   return (
@@ -44,10 +68,7 @@ const Login = () => {
               <h1>SoftApps</h1>
               <h3>Login</h3>
               <Form
-                initialValues={{
-                  email: 'affanhashmi1@yahoo.com',
-                  password: '123'
-                }}
+                form={form}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 size="large"
@@ -85,7 +106,13 @@ const Login = () => {
                 </Form.Item>
               </Form>
 
-              <a href="/">Don't have an account? Register now!</a>
+              <div>
+                <Button onClick={onForgot} type="text">Forgot Password</Button>
+              </div>
+
+              <div>
+                <NavLink to="/">Don't have an account? Register now!</NavLink>
+              </div>
             </Card>
           </Col>
           <Col span={9}></Col>

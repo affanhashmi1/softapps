@@ -27,6 +27,11 @@ export const getUser = async (id) => {
   return response
 }
 
+export const verifyUser = async (payload) => {
+  const { data: response } = await axios.post(`${apiUrl}/user/verify`, payload)
+  return response
+}
+
 export const login = async (payload) => {
   const { data: response } = await axios.post(`${apiUrl}/user/login`, payload)
   return response
@@ -34,5 +39,20 @@ export const login = async (payload) => {
 
 export const logout = async (payload) => {
   const { data: response } = await axios.post(`${apiUrl}/user/logout`, payload)
+  return response
+}
+
+export const confirm = async (payload) => {
+  const { data: response } = await axios.post(`${apiUrl}/user/confirm`, payload)
+  return response
+}
+
+export const forgot = async (payload) => {
+  const { data: response } = await axios.post(`${apiUrl}/user/forgot`, payload)
+  return response
+}
+
+export const updatePassword = async (payload) => {
+  const { data: response } = await axios.put(`${apiUrl}/user/forgot`, payload)
   return response
 }

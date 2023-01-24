@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { Button, Card, Col, Form, Input, message, Row, Select } from 'antd'
 import { createUser } from '../store/user'
 import * as userApis from '../utilities/apis/user'
@@ -13,9 +13,7 @@ const Login = () => {
 
   const onFinish = async (values) => {
     try {
-      console.log(values)
       const response = await userApis.createUser(values)
-      console.log(response)
       if (!response.status) throw new Error(response.message)
 
       dispatch(createUser(response.user))
@@ -23,6 +21,7 @@ const Login = () => {
     } catch (error) {
       messageApi.open({
         type: 'error',
+        duration: 5,
         content: error.message
       })
     }
@@ -30,10 +29,6 @@ const Login = () => {
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo)
-  }
-
-  const handleChange = (value) => {
-    console.log('selected: ', value)
   }
 
   return (
@@ -52,10 +47,7 @@ const Login = () => {
               <h3>Register</h3>
               <Form
                 initialValues={{
-                  name: 'Rehan',
-                  role: 'viewer',
-                  email: 'affanhashmi1@yahoo.com',
-                  password: '123'
+                  role: 'viewer'
                 }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
@@ -82,7 +74,6 @@ const Login = () => {
                 >
                   <Select
                     defaultValue="viewer"
-                    onChange={handleChange}
                     options={roleOptions}
                   />
                 </Form.Item>
@@ -120,7 +111,7 @@ const Login = () => {
                 </Form.Item>
               </Form>
 
-              <a href="/login">Already have an account? Login now!</a>
+              <NavLink to="/login">Already have an account? Login now!</NavLink>
             </Card>
           </Col>
           <Col span={9}></Col>
