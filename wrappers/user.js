@@ -1,6 +1,7 @@
-// const omit = require('lodash/omit')
+const omit = require('lodash/omit')
+const dayjs = require('dayjs')
 const constants = require('../utilities/constants')
-const User = require('../schemas/User.model')
+const User = require('../models/User.model')
 const emailService = require('../services/email')
 
 const onRegister = async (user) => {
@@ -10,7 +11,7 @@ const onRegister = async (user) => {
     subject: 'Email Confirmation Link',
     message: `
       <p>Thank you for joining, we would like you to confirm your <strong>email address</strong> by clicking the link below</p>
-      <a href="http://localhost:3000/confirm">Confirm email address</a>
+      <a href="http://localhost:3000/confirm?email=${user.email}&e=${constants.LINK_EXPIRY()}">Confirm email address</a>
       <p>SoftApps &copy; ${new Date().getFullYear()}</p>
     `
   }
@@ -20,11 +21,11 @@ const onRegister = async (user) => {
 const onForgotPassword = async (user) => {
   const payload = {
     name: user.name,
-    email: user.email,
+    email: 'affanhashmi1@yahoo.com',
     subject: 'Forgot Password Link',
     message: `
       <p><strong>Forgot your password</strong> by clicking the link below you will be able to change your account password</p>
-      <a href="http://localhost:3000/forgot">Confirm email address</a>
+      <a href="http://localhost:3000/forgot?email=${user.email}&e=${constants.LINK_EXPIRY()}">Change your password</a>
       <p>If you didn't initiate this request please ignore this message</p>
       <p>SoftApps &copy; ${new Date().getFullYear()}</p>
     `
@@ -39,6 +40,7 @@ const createUser = async (payload) => {
 
     payload.password = await constants.GENERAL_FUNCTIONS.ENCRYPT_PASSWORD(payload.password)
     payload.status = constants.USER_STATUS.PENDING
+    payload.email_verified = false
     const response = await User.create(payload)
 
     onRegister(response)
@@ -148,12 +150,15 @@ const getUser = async (id) => {
 }
 
 const login = async (payload) => {
+  let response = null
+
   try {
     const message = constants.GENERAL_FUNCTIONS.FORMAT_REQUIRED_FIELDS(['email', 'password'], payload)
     if (message.length > 0) throw new Error(`${message.join(', ')} missing from the request`)
 
-    const response = await User.findOne({ email: payload.email })
+    response = await User.findOne({ email: payload.email })
     if (!response) throw new Error('Invalid email or password')
+    if (!response.email_verified) throw new Error('Email not verified, We\'ve send you a verification link please check your email')
 
     const comparison = await constants.GENERAL_FUNCTIONS.COMPARE_PASSWORD(payload.password, response.password)
     if (!comparison) throw new Error('Invalid email or password')
@@ -163,6 +168,8 @@ const login = async (payload) => {
       user: response
     }
   } catch (error) {
+    if (error.message === 'Email not verified, We\'ve send you a verification link please check your email') onRegister(response)
+
     return {
       status: false,
       message: constants.GENERAL_FUNCTIONS.FORMAT_ERROR(error)
@@ -187,4 +194,71 @@ const logout = async (token) => {
   }
 }
 
-module.exports = { createUser, updateUser, deleteUser, getUsers, getUser, login, logout }
+const confirm = async (payload) => {
+  try {
+    if (!payload.email) throw new Error('email missing from the request')
+
+    const user = await User.findOne({ email: payload.email })
+    if (!user) throw new Error('user not found')
+
+    user.email_verified = true
+    const response = await user.save()
+
+    return {
+      status: true,
+      user: response
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: constants.GENERAL_FUNCTIONS.FORMAT_ERROR(error)
+    }
+  }
+}
+
+const forgot = async (payload) => {
+  try {
+    if (!payload.email) throw new Error('email missing from the request')
+
+    const response = await User.findOne({ email: payload.email })
+    if (!response) throw new Error('user not found')
+
+    await onForgotPassword(response)
+
+    return {
+      status: true,
+      user: response
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: constants.GENERAL_FUNCTIONS.FORMAT_ERROR(error)
+    }
+  }
+}
+
+const updatePassword = async (payload) => {
+  try {
+    const message = constants.GENERAL_FUNCTIONS.FORMAT_REQUIRED_FIELDS(['email', 'password'], payload)
+    if (message.length > 0) throw new Error(`${message.join(', ')} missing from the request`)
+
+    const user = await User.findOne({ email: payload.email })
+    if (!user) throw new Error('user not found')
+
+    user.email_verified = true
+    user.password = await constants.GENERAL_FUNCTIONS.ENCRYPT_PASSWORD(payload.password)
+    const response = await user.save()
+
+    return {
+      status: true,
+      user: response
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: constants.GENERAL_FUNCTIONS.FORMAT_ERROR(error)
+    }
+  }
+}
+
+module.exports = { createUser, updateUser, deleteUser, getUsers, getUser, login, logout, confirm, forgot, updatePassword }

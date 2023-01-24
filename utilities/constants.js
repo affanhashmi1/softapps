@@ -1,10 +1,16 @@
 const bcrypt = require('bcrypt')
+const dayjs = require('dayjs')
 
 module.exports = {
+  LINK_EXPIRY: () => dayjs().add(30, 'minutes').unix(),
   USER_STATUS: {
     PENDING: 'pending',
     VERIFIED: 'verified',
     BAN: 'ban'
+  },
+  POST_STATUS: {
+    PENDING: 'pending',
+    APPROVED: 'approved'
   },
   GENERAL_FUNCTIONS: {
     GET_TOKEN: () => {

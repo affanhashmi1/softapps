@@ -1,6 +1,4 @@
-// const middlewares = require('../utilities/middlewares')
 const userWrapper = require('../wrappers/user')
-// const sessionWrapper = require('../wrappers/session')
 
 module.exports = (router) => {
   // Basic
@@ -28,8 +26,6 @@ module.exports = (router) => {
   // Auth
 
   router.post('/user/login', async (req, res) => {
-    const response = await userWrapper.login(req.body)
-    req.session.user = response.user
     res.json(await userWrapper.login(req.body))
   })
 
@@ -37,7 +33,15 @@ module.exports = (router) => {
     res.json(await userWrapper.logout(req.body))
   })
 
-  // router.post('/user/validate', async (req, res) => {
-  //   res.json(await sessionWrapper.validateSession(connection, req.body.token))
-  // })
+  router.post('/user/confirm', async (req, res) => {
+    res.json(await userWrapper.confirm(req.body))
+  })
+
+  router.post('/user/forgot', async (req, res) => {
+    res.json(await userWrapper.forgot(req.body))
+  })
+
+  router.put('/user/forgot', async (req, res) => {
+    res.json(await userWrapper.updatePassword(req.body))
+  })
 }

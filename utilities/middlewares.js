@@ -1,7 +1,4 @@
-const connection = require('./connection')
 const constants = require('./constants')
-const sessionWrapper = require('../wrappers/session')
-const userWrapper = require('../wrappers/user')
 
 const authentication = async (req, res, next) => {
   try {
@@ -15,7 +12,7 @@ const authentication = async (req, res, next) => {
 
     req.user_id = response.session.id
 
-    next()
+    return next()
   } catch (error) {
     res.json({
       status: false,

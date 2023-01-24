@@ -5,7 +5,6 @@ const userSchema = new mongoose.Schema({
   role: String,
   email: String,
   email_verified: Boolean,
-  email_verification_code: String,
   password: String,
   status: String
 })
